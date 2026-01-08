@@ -5,11 +5,21 @@
 
 namespace math {
 
+struct point4 {
+    float x;
+    float y;
+    float z;
+    float w;
+};
 class vec4 {
   public:
     vec4();
-    vec4(float x, float y, float z, float w);
-    vec4(const vec3 &v, float w);
+    vec4(float x, float y, float z, float w = 1.0f);
+    vec4(const point4& point);
+    vec4(const point4& start, const point4& end);
+    vec4(const vec3& v, float w = 1.0f);
+    vec4(const point3& point, float w = 1.0f);
+    vec4(const vec4& other);
     float x() const;
     float y() const;
     float z() const;
@@ -51,6 +61,16 @@ class vec4 {
 
     vec4 lerp(const vec4 &other, float t) const;
     vec4 reflect(const vec4 &normal) const;
+
+    vec4 scale_by_vector(const vec3& scale) const;
+    vec4 scale_by_scalar(float scale) const;
+    vec4 transfer_by_vector(const vec3& translation) const;
+    vec4 rotate_around_x_axis(float angle) const;
+    vec4 rotate_around_y_axis(float angle) const;
+    vec4 rotate_around_z_axis(float angle) const;
+
+    vec4 to_normalized_device_coordinates() const;
+    void normalize_to_device_coordinates();
 
     static vec4 zero();
     static vec4 one();

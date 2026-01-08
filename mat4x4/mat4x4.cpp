@@ -1,5 +1,6 @@
 #include "mat4x4.hpp"
 
+#include <cmath>
 #include <immintrin.h>
 
 #include <cstring>
@@ -493,6 +494,18 @@ math::mat4x4 &math::mat4x4::operator*=(const float scalar) {
     return *this;
 }
 
+math::vec4 math::mat4x4::operator*(const vec4& vector) const
+{
+    vec4 result;
+
+    result.x(m_matrix[0][0] * vector.x() + m_matrix[0][1] * vector.y() + m_matrix[0][2] * vector.z() + m_matrix[0][3] * vector.w());
+    result.y(m_matrix[1][0] * vector.x() + m_matrix[1][1] * vector.y() + m_matrix[1][2] * vector.z() + m_matrix[1][3] * vector.w());
+    result.z(m_matrix[2][0] * vector.x() + m_matrix[2][1] * vector.y() + m_matrix[2][2] * vector.z() + m_matrix[2][3] * vector.w());
+    result.w(m_matrix[3][0] * vector.x() + m_matrix[3][1] * vector.y() + m_matrix[3][2] * vector.z() + m_matrix[3][3] * vector.w());
+
+    return result;
+}
+
 float &math::mat4x4::at(int row, int col) { return m_matrix[row][col]; }
 
 const float &math::mat4x4::at(int row, int col) const {
@@ -634,6 +647,80 @@ math::mat4x4 math::mat4x4::zero() {
              {0.0f, 0.0f, 0.0f, 0.0f}}};
 }
 
+math::mat4x4 math::mat4x4::translation(float tx, float ty, float tz)
+{
+    return { { { 1.0f, 0.0f, 0.0f, tx },
+        { 0.0f, 1.0f, 0.0f, ty },
+        { 0.0f, 0.0f, 1.0f, tz },
+        { 0.0f, 0.0f, 0.0f, 1.0f } } };
+}
+
+math::mat4x4 math::mat4x4::scaling(float sx, float sy, float sz)
+{
+    return { { { sx, 0.0f, 0.0f, 0.0f },
+        { 0.0f, sy, 0.0f, 0.0f },
+        { 0.0f, 0.0f, sz, 0.0f },
+        { 0.0f, 0.0f, 0.0f, 1.0f } } };
+}
+
+math::mat4x4 math::mat4x4::rotation_x(float angle_rad)
+{
+    float cos_a = std::cos(angle_rad);
+    float sin_a = std::sin(angle_rad);
+    return { { { 1.0f, 0.0f, 0.0f, 0.0f },
+        { 0.0f, cos_a, -sin_a, 0.0f },
+        { 0.0f, sin_a, cos_a, 0.0f },
+        { 0.0f, 0.0f, 0.0f, 1.0f } } };
+}
+
+math::mat4x4 math::mat4x4::rotation_y(float angle_rad)
+{
+    float cos_a = std::cos(angle_rad);
+    float sin_a = std::sin(angle_rad);
+    return { { { cos_a, 0.0f, sin_a, 0.0f },
+        { 0.0f, 1.0f, 0.0f, 0.0f },
+        { -sin_a, 0.0f, cos_a, 0.0f },
+        { 0.0f, 0.0f, 0.0f, 1.0f } } };
+}
+
+math::mat4x4 math::mat4x4::rotation_z(float angle_rad)
+{
+    float cos_a = std::cos(angle_rad);
+    float sin_a = std::sin(angle_rad);
+    return { { { cos_a, -sin_a, 0.0f, 0.0f },
+        { sin_a, cos_a, 0.0f, 0.0f },
+        { 0.0f, 0.0f, 1.0f, 0.0f },
+        { 0.0f, 0.0f, 0.0f, 1.0f } } };
+}
+
+math::mat4x4 math::mat4x4::rotation_axis_angle_intrinsic(std::optional<float> angle_rad_x,
+    std::optional<float> angle_rad_y,
+    std::optional<float> angle_rad_z)
+{
+    mat4x4 rot_x = (angle_rad_x.has_value()) ? rotation_x(angle_rad_x.value()) : mat4x4::identity();
+    mat4x4 rot_y = (angle_rad_y.has_value()) ? rotation_y(angle_rad_y.value()) : mat4x4::identity();
+    mat4x4 rot_z = (angle_rad_z.has_value()) ? rotation_z(angle_rad_z.value()) : mat4x4::identity();
+    mat4x4 rotation = rot_x * rot_y * rot_z;
+    return rotation;
+}
+
+math::mat4x4 math::mat4x4::rotation_axis_angle_extrinsic(std::optional<float> angle_rad_x,
+    std::optional<float> angle_rad_y,
+    std::optional<float> angle_rad_z)
+{
+    mat4x4 rot_x = (angle_rad_x.has_value()) ? rotation_x(angle_rad_x.value()) : mat4x4::identity();
+    mat4x4 rot_y = (angle_rad_y.has_value()) ? rotation_y(angle_rad_y.value()) : mat4x4::identity();
+    mat4x4 rot_z = (angle_rad_z.has_value()) ? rotation_z(angle_rad_z.value()) : mat4x4::identity();
+    mat4x4 rotation = rot_z * rot_y * rot_x;
+    return rotation;
+}
+
+math::mat4x4 math::mat4x4::make_model_matrix(
+    const mat4x4& translation, const mat4x4& rotation, const mat4x4& scaling)
+{
+    return translation * rotation * scaling;
+}
+
 std::ostream &math::operator<<(std::ostream &os, const math::mat4x4 &matrix) {
     os << "[" << matrix.at(0, 0) << ", " << matrix.at(0, 1) << ", " << matrix.at(0, 2) << ", "
        << matrix.at(0, 3) << "]\n"
@@ -643,6 +730,5 @@ std::ostream &math::operator<<(std::ostream &os, const math::mat4x4 &matrix) {
        << matrix.at(2, 3) << "]\n"
        << "[" << matrix.at(3, 0) << ", " << matrix.at(3, 1) << ", " << matrix.at(3, 2) << ", "
        << matrix.at(3, 3) << "]\n";
-
     return os;
 }

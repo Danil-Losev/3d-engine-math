@@ -14,6 +14,20 @@ vec3::vec3(float x, float y, float z, bool normalize) {
     }
 }
 
+vec3::vec3(const point3& point)
+{
+    m_x = point.x;
+    m_y = point.y;
+    m_z = point.z;
+}
+
+vec3::vec3(const point3& start, const point3& end)
+{
+    m_x = end.x - start.x;
+    m_y = end.y - start.y;
+    m_z = end.z - start.z;
+}
+
 vec3::vec3(const vec2 &xy, float z, bool normalize) {
     this->m_x = xy.x();
     this->m_y = xy.y();
@@ -21,6 +35,23 @@ vec3::vec3(const vec2 &xy, float z, bool normalize) {
     if (normalize) [[unlikely]] {
         this->normalize();
     }
+}
+
+vec3::vec3(const point2& point, float z, bool normalize)
+{
+    m_x = point.x;
+    m_y = point.y;
+    m_z = z;
+    if (normalize) [[unlikely]] {
+        this->normalize();
+    }
+}
+
+vec3::vec3(const vec3& other)
+{
+    m_x = other.m_x;
+    m_y = other.m_y;
+    m_z = other.m_z;
 }
 
 float vec3::x() const { return m_x; }

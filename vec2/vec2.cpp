@@ -11,6 +11,24 @@ math::vec2::vec2(float x, float y) {
     m_y = y;
 }
 
+math::vec2::vec2(const point2& point)
+{
+    m_x = point.x;
+    m_y = point.y;
+}
+
+math::vec2::vec2(const point2& start, const point2& end)
+{
+    m_x = end.x - start.x;
+    m_y = end.y - start.y;
+}
+
+math::vec2::vec2(const vec2& other)
+{
+    m_x = other.m_x;
+    m_y = other.m_y;
+}
+
 float math::vec2::x() const { return m_x; }
 
 float math::vec2::y() const { return m_y; }

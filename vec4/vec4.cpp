@@ -4,7 +4,39 @@
 math::vec4::vec4() : m_x(0.0f), m_y(0.0f), m_z(0.0f), m_w(0.0f) {}
 math::vec4::vec4(float x, float y, float z, float w) : m_x(x), m_y(y), m_z(z), m_w(w) {}
 
+math::vec4::vec4(const point4& point)
+{
+    m_x = point.x;
+    m_y = point.y;
+    m_z = point.z;
+    m_w = point.w;
+}
+
+math::vec4::vec4(const point4& start, const point4& end)
+{
+    m_x = end.x - start.x;
+    m_y = end.y - start.y;
+    m_z = end.z - start.z;
+    m_w = end.w - start.w;
+}
+
 math::vec4::vec4(const vec3 &v, float w) : m_x(v.x()), m_y(v.y()), m_z(v.z()), m_w(w) {}
+
+math::vec4::vec4(const point3& point, float w)
+{
+    m_x = point.x;
+    m_y = point.y;
+    m_z = point.z;
+    m_w = w;
+}
+
+math::vec4::vec4(const vec4& other)
+{
+    m_x = other.m_x;
+    m_y = other.m_y;
+    m_z = other.m_z;
+    m_w = other.m_w;
+}
 
 float math::vec4::x() const { return m_x; }
 
@@ -185,6 +217,73 @@ math::vec4 math::vec4::reflect(const vec4 &normal) const {
     float factor = 2.0f * dot;
 
     return vec4(m_x - factor * nx, m_y - factor * ny, m_z - factor * nz, m_w - factor * nw);
+}
+
+math::vec4 math::vec4::scale_by_vector(const vec3& scale) const
+{
+    return vec4(m_x * scale.x(), m_y * scale.y(), m_z * scale.z(), m_w);
+}
+
+math::vec4 math::vec4::scale_by_scalar(float scale) const
+{
+    return vec4(m_x * scale, m_y * scale, m_z * scale, m_w);
+}
+
+math::vec4 math::vec4::transfer_by_vector(const vec3& translation) const
+{
+    return vec4(m_x + translation.x(), m_y + translation.y(), m_z + translation.z(), m_w);
+}
+
+math::vec4 math::vec4::rotate_around_x_axis(float angle) const
+{
+    return vec4(
+        m_x,
+        m_y * std::cos(angle) - m_z * std::sin(angle),
+        m_y * std::sin(angle) + m_z * std::cos(angle),
+        m_w);
+}
+
+math::vec4 math::vec4::rotate_around_y_axis(float angle) const
+{
+    return vec4(
+        m_x * std::cos(angle) + m_z * std::sin(angle),
+        m_y,
+        -m_x * std::sin(angle) + m_z * std::cos(angle),
+        m_w);
+}
+
+math::vec4 math::vec4::rotate_around_z_axis(float angle) const
+{
+    return vec4(
+        m_x * std::cos(angle) - m_y * std::sin(angle),
+        m_x * std::sin(angle) + m_y * std::cos(angle),
+        m_z,
+        m_w);
+}
+
+math::vec4 math::vec4::to_normalized_device_coordinates() const
+{
+    if (m_w == 0.0f) [[unlikely]] {
+        return vec4(0.0f, 0.0f, 0.0f, 0.0f);
+    }
+    float inv_w = 1.0f / m_w;
+    return vec4(m_x * inv_w, m_y * inv_w, m_z * inv_w, 1.0f);
+}
+
+void math::vec4::normalize_to_device_coordinates()
+{
+    if (m_w == 0.0f) [[unlikely]] {
+        m_x = 0.0f;
+        m_y = 0.0f;
+        m_z = 0.0f;
+        m_w = 0.0f;
+        return;
+    }
+    float inv_w = 1.0f / m_w;
+    m_x *= inv_w;
+    m_y *= inv_w;
+    m_z *= inv_w;
+    m_w = 1.0f;
 }
 
 math::vec4 math::vec4::zero() { return vec4(0.0f, 0.0f, 0.0f, 0.0f); }

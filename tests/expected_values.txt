@@ -1,0 +1,37 @@
+
+=== ROTATION ORDER DIAGNOSTIC ===
+
+Initial vector: (1, 0, 0)
+
+--- Individual Rotations (90┬░) ---
+Rx ├Ч (1,0,0) = (1, 0, 0)
+Ry ├Ч (1,0,0) = (-4.37114e-08, 0, -1)
+Rz ├Ч (1,0,0) = (-4.37114e-08, 1, 0)
+
+--- Manual Composition Test ---
+(Rx ├Ч Ry ├Ч Rz) ├Ч v = (1.91069e-15, -8.74228e-08, 1)
+  Order applied: Rz тЖТ Ry тЖТ Rx (right-to-left)
+(Rz ├Ч Ry ├Ч Rx) ├Ч v = (1.91069e-15, -4.37114e-08, -1)
+  Order applied: Rx тЖТ Ry тЖТ Rz (right-to-left)
+
+--- rotation_axis_angle Test ---
+rotation_axis_angle(x, y, z) ├Ч v = (1.91069e-15, -4.37114e-08, -1)
+
+тЬУ Matches (Rz ├Ч Ry ├Ч Rx) - XтЖТYтЖТZ order
+
+--- Step-by-step rotation_axis_angle internals ---
+Based on code: rotation = I ├Ч Rz ├Ч Ry ├Ч Rx
+Multiplication order (left-to-right): I, Rz, Ry, Rx
+Application order (right-to-left): Rx тЖТ Ry тЖТ Rz
+Simulated result: (1.91069e-15, -4.37114e-08, -1)
+тЬУ Simulation matches rotation_axis_angle
+
+--- Testing Ry ├Ч Rx combination ---
+(Ry ├Ч Rx) ├Ч (1,0,0) = (-4.37114e-08, 0, -1)
+Expected if Rx first: (1,0,0) stays, then Ry: (0,0,-1)
+Expected if Ry first: (0,0,-1), then Rx: (0,1,-1)? No... let me recalculate
+
+Step 1 - Apply Rx: (1,0,0) тЖТ (1, 0, 0)
+Step 2 - Apply Ry: тЖТ (-4.37114e-08, 0, -1)
+
+================================

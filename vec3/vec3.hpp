@@ -4,12 +4,22 @@
 #include "../vec2/vec2.hpp"
 
 namespace math {
+
+struct point3 {
+    float x;
+    float y;
+    float z;
+};
 class vec3 {
   public:
     vec3();
     vec3(float x, float y, float z, bool normalize = false);
+    vec3(const point3 &point);
+    vec3(const point3 &start, const point3 &end);
     vec3(const vec2 &xy, float z, bool normalize = false);
-
+    vec3(const point2 &point, float z, bool normalize = false);
+    vec3(const vec3 &other);
+    
     float x() const;
     float y() const;
     float z() const;

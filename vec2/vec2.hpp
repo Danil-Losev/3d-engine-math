@@ -2,10 +2,19 @@
 #define VEC2_HPP
 
 namespace math {
+
+struct point2 {
+    float x;
+    float y;
+};
+
 class vec2 {
   public:
     vec2();
     vec2(float x, float y);
+    vec2(const point2 &point);
+    vec2(const point2 &start, const point2 &end);
+    vec2(const vec2 &other);
 
     float x() const;
     float y() const;

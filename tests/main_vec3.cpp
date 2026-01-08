@@ -3,7 +3,8 @@
 #include <iomanip>
 #include <iostream>
 
-#include "../vec3/vec3.hpp"
+#include "../vec4/vec4.hpp"
+
 
 void print_test(const char* name, bool passed)
 {
